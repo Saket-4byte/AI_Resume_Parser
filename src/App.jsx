@@ -397,7 +397,7 @@ function App() {
       <header className="fixed top-0 w-full z-40 bg-surface/70 dark:bg-[#020617]/70 backdrop-blur-xl border-b border-outline-variant/30 dark:border-slate-800 shadow-sm transition-colors duration-500">
         <nav className="flex justify-between items-center h-20 px-6 max-w-7xl mx-auto">
           <div className="text-2xl font-bold tracking-tight text-primary dark:text-primary-fixed-dim flex items-center gap-3">
-            <img src="/logo.png" alt="Logo" className="w-12 h-12 rounded-xl object-contain shadow-sm" />
+            <img src="logo.png" alt="Logo" className="w-12 h-12 rounded-xl object-contain shadow-sm" />
             <span>ResumeAI</span>
           </div>
           <div className="hidden md:flex items-center gap-8">
@@ -948,7 +948,7 @@ function App() {
       <footer className="bg-surface-container-low dark:bg-[#020617] border-t border-outline-variant/30 dark:border-slate-900 w-full py-12 transition-colors duration-500 z-10">
         <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-6">
           <div className="text-sm text-on-surface-variant dark:text-slate-550 flex items-center gap-3 font-bold">
-            <img src="/logo.png" alt="Logo" className="w-8 h-8 rounded-lg object-contain" />
+            <img src="logo.png" alt="Logo" className="w-8 h-8 rounded-lg object-contain" />
             <span>ResumeAI © 2026. All rights reserved.</span>
           </div>
           <div className="flex gap-6 text-xs text-on-surface-variant dark:text-slate-400">
@@ -979,7 +979,7 @@ function App() {
               {/* Title & File */}
               <div>
                 <h4 className="text-lg font-bold dark:text-white flex items-center gap-3 justify-center">
-                  <img src="/logo.png" alt="Logo" className="w-9 h-9 rounded-lg object-contain animate-pulse" />
+                  <img src="logo.png" alt="Logo" className="w-9 h-9 rounded-lg object-contain animate-pulse" />
                   <span>AI Parsing in Progress</span>
                 </h4>
                 <p className="text-xs text-on-surface-variant dark:text-slate-400 mt-2 font-medium bg-surface-container dark:bg-slate-950 px-3 py-1.5 rounded-lg border border-outline-variant/10 dark:border-slate-800 max-w-xs truncate">
