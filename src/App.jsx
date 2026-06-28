@@ -193,106 +193,8 @@ const generateMockCandidate = (filename, fileText) => {
   };
 };
 
-// Call the backend API parser endpoint or call Gemini API directly if frontendApiKey is provided
-const parseResumeWithGemini = async (fileText, filename, frontendApiKey = '') => {
-  if (frontendApiKey) {
-    const model = "gemini-2.5-flash";
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${frontendApiKey}`;
-    
-    const prompt = `Parse the following resume text into a structured JSON profile. Extracted fields should match this schema: {
-  name: string,
-  role: string,
-  skills: string[],
-  experience: { company: string, title: string, period: string }[],
-  education: { school: string, degree: string, period: string, grade: string }[],
-  projects: { title: string, tool: string, description: string }[],
-  email: string,
-  phone: string,
-  score: number (match score from 0-100 indicating relevance to a software/tech role),
-  summary: string (brief AI executive summary)
-}
-
-Resume text:
-${fileText || filename}`;
-
-    const apiResponse = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: "OBJECT",
-            properties: {
-              name: { type: "STRING" },
-              role: { type: "STRING" },
-              skills: { type: "ARRAY", items: { type: "STRING" } },
-              experience: {
-                type: "ARRAY",
-                items: {
-                  type: "OBJECT",
-                  properties: {
-                    company: { type: "STRING" },
-                    title: { type: "STRING" },
-                    period: { type: "STRING" }
-                  },
-                  required: ["company", "title", "period"]
-                }
-              },
-              education: {
-                type: "ARRAY",
-                items: {
-                  type: "OBJECT",
-                  properties: {
-                    school: { type: "STRING" },
-                    degree: { type: "STRING" },
-                    period: { type: "STRING" },
-                    grade: { type: "STRING" }
-                  },
-                  required: ["school", "degree", "period"]
-                }
-              },
-              projects: {
-                type: "ARRAY",
-                items: {
-                  type: "OBJECT",
-                  properties: {
-                    title: { type: "STRING" },
-                    tool: { type: "STRING" },
-                    description: { type: "STRING" }
-                  },
-                  required: ["title", "tool", "description"]
-                }
-              },
-              email: { type: "STRING" },
-              phone: { type: "STRING" },
-              score: { type: "INTEGER" },
-              summary: { type: "STRING" }
-            },
-            required: ["name", "role", "skills", "experience", "education", "projects", "email", "phone", "score", "summary"]
-          }
-        }
-      })
-    });
-
-    if (!apiResponse.ok) {
-      const errText = await apiResponse.text();
-      throw new Error(`Gemini direct API call failed: ${apiResponse.status} - ${errText}`);
-    }
-
-    const data = await apiResponse.json();
-    const textResponse = data.candidates[0].content.parts[0].text;
-    const parsedCandidate = JSON.parse(textResponse);
-
-    return {
-      ...parsedCandidate,
-      id: `candidate-${Date.now()}`,
-      status: 'New',
-      date: 'Today'
-    };
-  }
-
+// Call the backend API parser endpoint
+const parseResumeWithGemini = async (fileText, filename) => {
   const response = await fetch('/api/parse-resume', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -323,22 +225,6 @@ function App() {
 
   // API Integration states
   const [backendStatus, setBackendStatus] = useState({ online: false, apiConfigured: false });
-  const [frontendApiKey, setFrontendApiKey] = useState(localStorage.getItem('gemini_api_key') || '');
-  const [showKeyModal, setShowKeyModal] = useState(false);
-  const [tempApiKey, setTempApiKey] = useState('');
-
-  const handleSaveApiKey = () => {
-    localStorage.setItem('gemini_api_key', tempApiKey.trim());
-    setFrontendApiKey(tempApiKey.trim());
-    setShowKeyModal(false);
-  };
-
-  const handleClearApiKey = () => {
-    localStorage.removeItem('gemini_api_key');
-    setFrontendApiKey('');
-    setTempApiKey('');
-    setShowKeyModal(false);
-  };
 
   // Check backend status on mount
   useEffect(() => {
@@ -464,14 +350,10 @@ function App() {
 
         let newCandidate;
 
-        const activeKey = frontendApiKey || '';
-        const useDirectAPI = !!activeKey;
-        const useBackend = backendStatus.apiConfigured;
-
-        // If either Client API key or Backend API is available, attempt real Gemini parsing
-        if (useDirectAPI || useBackend) {
+        // If Backend API is online and has Gemini API key, attempt real backend Gemini API parsing
+        if (backendStatus.apiConfigured) {
           try {
-            newCandidate = await parseResumeWithGemini(fileText, parseFilename, activeKey);
+            newCandidate = await parseResumeWithGemini(fileText, parseFilename);
           } catch (error) {
             console.error("Gemini API parsing failed, falling back to mock:", error);
             newCandidate = generateMockCandidate(parseFilename, fileText);
@@ -516,22 +398,7 @@ function App() {
         <nav className="flex justify-between items-center h-20 px-6 max-w-7xl mx-auto">
           <div className="text-2xl font-bold tracking-tight text-primary dark:text-primary-fixed-dim flex items-center gap-3">
             <img src="logo.png" alt="Logo" className="w-12 h-12 rounded-xl object-contain shadow-sm" />
-            <div className="flex flex-col">
-              <span className="leading-tight">ResumeAI</span>
-              <span className={`text-[9px] font-bold tracking-wider uppercase transition-colors duration-300 ${
-                backendStatus.online 
-                  ? 'text-emerald-500 dark:text-emerald-400' 
-                  : frontendApiKey 
-                    ? 'text-primary dark:text-primary-fixed-dim' 
-                    : 'text-amber-500'
-              }`}>
-                {backendStatus.online 
-                  ? '● Live (Server)' 
-                  : frontendApiKey 
-                    ? '● Live (Client API)' 
-                    : '● Demo Mode'}
-              </span>
-            </div>
+            <span>ResumeAI</span>
           </div>
           <div className="hidden md:flex items-center gap-8">
             <a className="font-semibold text-sm text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim py-2" href="#">Home</a>
@@ -539,24 +406,6 @@ function App() {
             <a className="font-semibold text-sm text-on-surface-variant dark:text-slate-400 hover:text-primary dark:hover:text-primary-fixed-dim transition-colors py-2" href="#demo">Interactive Demo</a>
           </div>
           <div className="flex items-center gap-4">
-            {/* API Key Settings Toggle */}
-            <button
-              onClick={() => {
-                setTempApiKey(frontendApiKey);
-                setShowKeyModal(true);
-              }}
-              className={`p-2 rounded-full hover:bg-secondary-container/50 dark:hover:bg-slate-850 transition-all cursor-pointer relative ${
-                frontendApiKey ? 'text-primary dark:text-primary-fixed-dim' : 'text-on-surface-variant dark:text-slate-400'
-              }`}
-              id="api-key-settings"
-              title="Configure Gemini API Key"
-            >
-              <span className="material-symbols-outlined block">vpn_key</span>
-              {frontendApiKey && (
-                <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-emerald-500"></span>
-              )}
-            </button>
-
             {/* Theme Toggle */}
             <button
               onClick={toggleDarkMode}
@@ -1174,87 +1023,7 @@ function App() {
         </div>
       )}
 
-      {/* Settings Modal */}
-      {showKeyModal && (
-        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-          <div className="bg-white dark:bg-slate-900 border border-outline-variant/30 dark:border-slate-800 rounded-2xl max-w-md w-full p-8 shadow-2xl relative overflow-hidden transition-all duration-300">
-            {/* Background design */}
-            <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-full blur-xl"></div>
-            
-            <div className="flex flex-col space-y-6">
-              <div className="flex justify-between items-center">
-                <h4 className="text-lg font-bold dark:text-white flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim">vpn_key</span>
-                  Gemini API Configuration
-                </h4>
-                <button 
-                  onClick={() => setShowKeyModal(false)}
-                  className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-850 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
-                >
-                  <span className="material-symbols-outlined block">close</span>
-                </button>
-              </div>
 
-              <p className="text-xs text-on-surface-variant dark:text-slate-400 leading-relaxed">
-                Configure a local <strong>Gemini API Key</strong> to enable real-time AI parsing directly in the browser. Useful when deploying to static hosting environments like GitHub Pages.
-              </p>
-
-              <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-wider text-on-surface-variant dark:text-slate-400">
-                  Gemini API Key
-                </label>
-                <input
-                  type="password"
-                  value={tempApiKey}
-                  onChange={(e) => setTempApiKey(e.target.value)}
-                  placeholder="Enter your GEMINI_API_KEY..."
-                  className="w-full px-4 py-2.5 rounded-xl border border-outline-variant/40 dark:border-slate-700/60 bg-surface-container-low dark:bg-slate-950 text-sm focus:outline-none focus:border-primary/80 focus:ring-1 focus:ring-primary/40 dark:text-slate-200"
-                />
-              </div>
-
-              {/* Status details inside modal */}
-              <div className="p-4 rounded-xl bg-surface-container-low/50 dark:bg-slate-950/40 border border-outline-variant/20 dark:border-slate-800 space-y-2">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="dark:text-slate-400">Backend Server:</span>
-                  <span className={`font-semibold ${backendStatus.online ? 'text-emerald-500' : 'text-slate-400'}`}>
-                    {backendStatus.online ? 'Online' : 'Offline'}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center text-xs">
-                  <span className="dark:text-slate-400">Active Key Mode:</span>
-                  <span className={`font-semibold ${frontendApiKey ? 'text-primary dark:text-primary-fixed-dim' : 'text-amber-500'}`}>
-                    {frontendApiKey ? 'Client Key Loaded' : 'None (Mock Demo)'}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex gap-3 justify-end pt-2">
-                {frontendApiKey && (
-                  <button
-                    onClick={handleClearApiKey}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-error hover:bg-error/10 transition-all cursor-pointer border border-error/25"
-                  >
-                    Clear Key
-                  </button>
-                )}
-                <button
-                  onClick={() => setShowKeyModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-slate-850 transition-all cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSaveApiKey}
-                  className="bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container px-5 py-2 rounded-xl font-bold text-xs hover:shadow-md transition-all active:scale-95 cursor-pointer"
-                >
-                  Save Settings
-                </button>
-              </div>
-
-            </div>
-          </div>
-        </div>
-      )}
 
     </div>
   );
