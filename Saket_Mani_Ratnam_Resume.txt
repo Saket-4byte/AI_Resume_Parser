@@ -1,0 +1,43 @@
+Saket Mani Ratnam
+GitHub: Saket-4byte | LinkedIn: Saket Mani Ratnma | Email: ksaket309@gmail.com | Phone: +91.8340729659
+
+SUMMARY
+B.Tech Computer Science and Engineering student specializing in Artificial Intelligence and Machine Learning with hands-on exposure to programming, automation, and emerging AI technologies. Actively upskilling through industry-recognized certifications, open-source programs, and technical communities, gaining practical experience in problem-solving, collaboration, and real-world application development. Motivated to apply AI, ML, and RPA concepts in internships, projects, and innovation-driven environments.
+
+WORK EXPERIENCE
+Student Member – UiPath Student Club (Apr 2024 - May 2024)
+- Gained RPA skills using UiPath to automate routine tasks.
+- Built workflows for data entry, PDF extraction, and emails.
+- Participated in workshops and hands-on RPA projects.
+- Applied automation to improve efficiency and productivity.
+
+Open Source Contributor – GirlScript Summer of Code (GSSoC) (Remote 2024)
+- Collaborated with mentors and contributors on open-source projects, gaining hands-on experience in version control and collaborative development.
+- Worked on real-world codebases using structured development workflows, which strengthened problem-solving abilities, software development practices, and effective teamwork in a remote environment.
+
+PROJECTS
+Automated Attendance Tracker (UiPath)
+- Built a UiPath bot to extract attendance data from Excel and send automated email alerts.
+PDF Data Extractor Bot (UiPath)
+- Developed a UiPath workflow to extract and organize structured PDF data.
+Myntra Website Clone
+- Created a front-end clone using HTML and CSS with responsive UI design.
+
+EDUCATION
+2024 – 2028: B.Tech in CSE (AI & ML) at Kalinga Institute of Industrial Technology, Bhubaneswar (GPA: 9.12)
+2022: Class XII (CBSE) at Brad Ford International School (78.2%)
+2021: Class X (CBSE) at Brad Ford International School (72.8%)
+
+SKILLS
+Programming Languages: Java, Python, C
+Web Technologies: HTML, CSS
+Automation Tools: UiPath, Workflow Automation
+Core CS Concepts: Data Structures and Algorithms, Object-Oriented Programming
+AI/ML Fundamentals: Machine Learning, Prompt Engineering
+Developer Tools: Git, GitHub, VS Code
+Databases: SQL
+
+CERTIFICATIONS
+- Oracle Cloud Infrastructure 2025 Certified AI Foundations Associate
+- Oracle Cloud Infrastructure 2025 Certified Generative AI Professional
+- Google for Startups — Startup School: Prompt to Prototype
